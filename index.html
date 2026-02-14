@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoevaluación de Proyectos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #1f2937;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 50px 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .info-section {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+            text-align: left;
+        }
+        
+        .info-section h2 {
+            font-size: 16px;
+            color: #374151;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .info-section ul {
+            list-style: none;
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.8;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .info-section li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            flex-direction: column;
+            margin-top: 40px;
+        }
+        
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border: 1px solid #bfdbfe;
+        }
+        
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .feature-text {
+            font-size: 12px;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 35px 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📊</div>
+        
+        <h1>Autoevaluación de Proyectos</h1>
+        
+        <p class="subtitle">
+            Plataforma de evaluación colaborativa en tiempo real para Bellas Artes
+        </p>
+        
+        <div class="info-section">
+            <h2>¿Cómo funciona?</h2>
+            <ul>
+                <li>Los estudiantes se autoevalúan en 5 criterios</li>
+                <li>Los datos se actualizan en tiempo real</li>
+                <li>Visualiza gráficas y comparativas instantáneamente</li>
+                <li>Cada sesión comienza desde cero (sin datos previos)</li>
+            </ul>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <div class="feature-text">Formulario Intuitivo</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-text">Gráficas en Vivo</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <div class="feature-text">Móvil Optimizado</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-text">Sin Instalación</div>
+            </div>
+        </div>
+        
+        <div class="btn-container">
+            <a href="evaluacion-estudiantes.html" class="btn btn-primary">
+                → Acceder a la Evaluación
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>Aplicación desarrollada para la Universidad de Murcia</p>
+            <p>Grado en Bellas Artes</p>
+        </div>
+    </div>
+</body>
+</html>
