@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoevaluación de Proyectos - Tiempo Real</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1f2937;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid #3b82f6;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 12px 24px;
+            border: 2px solid #d1d5db;
+            background: white;
+            color: #4b5563;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .content {
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+        }
+        
+        /* FORMULARIO */
+        .form-container {
+            max-width: 550px;
+            margin: 0 auto;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .criterion {
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        .criterion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .criterion-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .criterion-weight {
+            font-size: 12px;
+            color: #9ca3af;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .input-with-max {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .input-with-max input {
+            flex: 1;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .max-label {
+            font-size: 12px;
+            color: #9ca3af;
+            min-width: 25px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            transition: width 0.2s ease;
+            border-radius: 4px;
+        }
+        
+        .total-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #0ea5e9;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .total-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0ea5e9;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* GRÁFICAS */
+        .graphs-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .graph-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .graph-box h3 {
+            margin-bottom: 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 800px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .graphs-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .stat-card {
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            text-align: center;
+        }
+        
+        .stat-card.highlight {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0fdf4 100%);
+            border-color: #10b981;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #10b981;
+        }
+        
+        /* TABLA */
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        thead {
+            background: #f3f4f6;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+        
+        tr:hover {
+            background: #f9fafb;
+        }
+        
+        .total-cell {
+            font-weight: 700;
+            color: #10b981;
+            text-align: center;
+        }
+        
+        .pct-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #4b5563;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .pct-badge-total {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #f0fdf4;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #10b981;
+            border-left: 3px solid #10b981;
+        }
+        
+        .pct-badge-media {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #dbeafe;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #3b82f6;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .pct-badge-total-media {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #dcfce7;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #059669;
+            border-left: 3px solid #059669;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 50px 20px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        .footer-count {
+            font-weight: 700;
+            color: #3b82f6;
+        }
+        
+        .canvas-wrapper {
+            position: relative;
+            height: 350px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Autoevaluación de Proyectos</h1>
+            <p class="subtitle">Evaluación colaborativa en tiempo real</p>
+        </header>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="cambiarVista('formulario')">Formulario</button>
+            <button class="nav-btn" onclick="cambiarVista('graficas')">Gráficas <span id="contador">(0)</span></button>
+            <button class="nav-btn" onclick="cambiarVista('tabla')">Tabla</button>
+        </div>
+        
+        <!-- FORMULARIO -->
+        <div id="formulario" class="content active">
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="nombre">Nombre del estudiante</label>
+                    <input type="text" id="nombre" placeholder="Ingresa el nombre">
+                </div>
+                
+                <div class="criterion">
+                    <div class="criterion-header">
+                        <span class="criterion-name">a. Congruencia entre proyecto y resultado</span>
+                    </div>
+                    <div style="margin-left: 15px; margin-top: 12px;">
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Boceto (20%)</div>
+                            <div class="input-with-max">
+                                <input type="number" id="boceto" min="0" max="20" placeholder="0">
+                                <span class="max-label">/20</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="prog-boceto" style="background: #3b82f6;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Resultado (20%)</div>
+                            <div class="input-with-max">
+                                <input type="number" id="resultado" min="0" max="20" placeholder="0">
+                                <span class="max-label">/20</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="prog-resultado" style="background: #06b6d4;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="criterion">
+                    <div class="criterion-header">
+                        <span class="criterion-name">b. Destreza y madurez intelectual/técnicos</span>
+                    </div>
+                    <div style="margin-left: 15px; margin-top: 12px;">
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Conceptualización de la obra (20%)</div>
+                            <div class="input-with-max">
+                                <input type="number" id="conceptualizacion" min="0" max="20" placeholder="0">
+                                <span class="max-label">/20</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="prog-conceptualizacion" style="background: #8b5cf6;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Acabado de la pieza (20%)</div>
+                            <div class="input-with-max">
+                                <input type="number" id="acabado" min="0" max="20" placeholder="0">
+                                <span class="max-label">/20</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="prog-acabado" style="background: #a855f7;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="criterion">
+                    <div class="criterion-header">
+                        <span class="criterion-name">c. Correcta exposición y argumentación crítica</span>
+                    </div>
+                    <div style="margin-left: 15px; margin-top: 12px;">
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Presentación de la propuesta (20%)</div>
+                            <div class="input-with-max">
+                                <input type="number" id="presentacion" min="0" max="20" placeholder="0">
+                                <span class="max-label">/20</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="prog-presentacion" style="background: #ec4899;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="total-preview">
+                    <span>Total estimado:</span>
+                    <span class="total-value" id="totalEstimado">—</span>
+                </div>
+                
+                <button class="submit-btn" onclick="registrarEvaluacion()">Registrar Evaluación</button>
+            </div>
+        </div>
+        
+        <!-- GRÁFICAS -->
+        <div id="graficas" class="content">
+            <div id="sin-datos-graficas" class="no-data" style="display: none;">
+                No hay datos aún. Completa el formulario.
+            </div>
+            
+            <div id="graficas-content">
+                <div class="stats-grid" id="statsGrid"></div>
+                
+                <div class="graph-box">
+                    <h3>Comparación por Criterio</h3>
+                    <div class="canvas-wrapper">
+                        <canvas id="chartCriterios"></canvas>
+                    </div>
+                </div>
+                
+                <div class="graph-box">
+                    <h3>Calificación Total</h3>
+                    <div class="canvas-wrapper">
+                        <canvas id="chartTotal"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLA -->
+        <div id="tabla" class="content">
+            <div id="sin-datos-tabla" class="no-data" style="display: none;">
+                No hay evaluaciones registradas.
+            </div>
+            
+            <div id="tabla-content" class="table-wrapper" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>Boceto</th>
+                            <th>Resultado</th>
+                            <th>Conceptualización</th>
+                            <th>Acabado</th>
+                            <th>Presentación</th>
+                            <th>Total</th>
+                            <th>Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer>
+            Total de estudiantes evaluados: <span class="footer-count" id="totalEstudiantes">0</span>
+        </footer>
+    </div>
+    
+    <script>
+        let estudiantes = [];
+        let chartCriterios = null;
+        let chartTotal = null;
+        
+        // Event listeners para actualización en tiempo real
+        document.getElementById('boceto').addEventListener('input', actualizarProgreso);
+        document.getElementById('resultado').addEventListener('input', actualizarProgreso);
+        document.getElementById('conceptualizacion').addEventListener('input', actualizarProgreso);
+        document.getElementById('acabado').addEventListener('input', actualizarProgreso);
+        document.getElementById('presentacion').addEventListener('input', actualizarProgreso);
+        
+        document.getElementById('boceto').addEventListener('input', calcularTotal);
+        document.getElementById('resultado').addEventListener('input', calcularTotal);
+        document.getElementById('conceptualizacion').addEventListener('input', calcularTotal);
+        document.getElementById('acabado').addEventListener('input', calcularTotal);
+        document.getElementById('presentacion').addEventListener('input', calcularTotal);
+        
+        function actualizarProgreso() {
+            const boceto = document.getElementById('boceto').value || 0;
+            const resultado = document.getElementById('resultado').value || 0;
+            const conceptualizacion = document.getElementById('conceptualizacion').value || 0;
+            const acabado = document.getElementById('acabado').value || 0;
+            const presentacion = document.getElementById('presentacion').value || 0;
+            
+            document.getElementById('prog-boceto').style.width = (boceto / 20) * 100 + '%';
+            document.getElementById('prog-resultado').style.width = (resultado / 20) * 100 + '%';
+            document.getElementById('prog-conceptualizacion').style.width = (conceptualizacion / 20) * 100 + '%';
+            document.getElementById('prog-acabado').style.width = (acabado / 20) * 100 + '%';
+            document.getElementById('prog-presentacion').style.width = (presentacion / 20) * 100 + '%';
+        }
+        
+        function calcularTotal() {
+            const boceto = parseFloat(document.getElementById('boceto').value) || 0;
+            const resultado = parseFloat(document.getElementById('resultado').value) || 0;
+            const conceptualizacion = parseFloat(document.getElementById('conceptualizacion').value) || 0;
+            const acabado = parseFloat(document.getElementById('acabado').value) || 0;
+            const presentacion = parseFloat(document.getElementById('presentacion').value) || 0;
+            
+            // Cada uno pesa 20% (0.2)
+            const total = (boceto * 0.2 + resultado * 0.2 + conceptualizacion * 0.2 + acabado * 0.2 + presentacion * 0.2).toFixed(1);
+            document.getElementById('totalEstimado').textContent = total;
+            return total;
+        }
+        
+        function registrarEvaluacion() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const boceto = parseFloat(document.getElementById('boceto').value);
+            const resultado = parseFloat(document.getElementById('resultado').value);
+            const conceptualizacion = parseFloat(document.getElementById('conceptualizacion').value);
+            const acabado = parseFloat(document.getElementById('acabado').value);
+            const presentacion = parseFloat(document.getElementById('presentacion').value);
+            
+            if (!nombre) {
+                alert('Ingresa el nombre del estudiante');
+                return;
+            }
+            
+            if (!boceto || !resultado || !conceptualizacion || !acabado || !presentacion) {
+                alert('Completa todas las calificaciones');
+                return;
+            }
+            
+            const total = (boceto * 0.2 + resultado * 0.2 + conceptualizacion * 0.2 + acabado * 0.2 + presentacion * 0.2).toFixed(1);
+            
+            const nuevoEstudiante = {
+                id: Date.now(),
+                nombre: nombre,
+                boceto: boceto,
+                resultado: resultado,
+                conceptualizacion: conceptualizacion,
+                acabado: acabado,
+                presentacion: presentacion,
+                total: total,
+                hora: new Date().toLocaleTimeString('es-ES')
+            };
+            
+            estudiantes.push(nuevoEstudiante);
+            
+            // Limpiar formulario
+            document.getElementById('nombre').value = '';
+            document.getElementById('boceto').value = '';
+            document.getElementById('resultado').value = '';
+            document.getElementById('conceptualizacion').value = '';
+            document.getElementById('acabado').value = '';
+            document.getElementById('presentacion').value = '';
+            document.getElementById('totalEstimado').textContent = '—';
+            
+            actualizarProgreso();
+            actualizarVistas();
+            
+            alert('✓ Evaluación registrada correctamente');
+        }
+        
+        function actualizarVistas() {
+            actualizarContador();
+            actualizarGraficas();
+            actualizarTabla();
+        }
+        
+        function actualizarContador() {
+            const count = estudiantes.length;
+            document.getElementById('contador').textContent = `(${count})`;
+            document.getElementById('totalEstudiantes').textContent = count;
+        }
+        
+        function actualizarGraficas() {
+            if (estudiantes.length === 0) {
+                document.getElementById('sin-datos-graficas').style.display = 'block';
+                document.getElementById('graficas-content').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('sin-datos-graficas').style.display = 'none';
+            document.getElementById('graficas-content').style.display = 'block';
+            
+            // Estadísticas
+            const stats = {
+                boceto: (estudiantes.reduce((s, e) => s + e.boceto, 0) / estudiantes.length).toFixed(1),
+                resultado: (estudiantes.reduce((s, e) => s + e.resultado, 0) / estudiantes.length).toFixed(1),
+                conceptualizacion: (estudiantes.reduce((s, e) => s + e.conceptualizacion, 0) / estudiantes.length).toFixed(1),
+                acabado: (estudiantes.reduce((s, e) => s + e.acabado, 0) / estudiantes.length).toFixed(1),
+                presentacion: (estudiantes.reduce((s, e) => s + e.presentacion, 0) / estudiantes.length).toFixed(1),
+                total: (estudiantes.reduce((s, e) => s + parseFloat(e.total), 0) / estudiantes.length).toFixed(1)
+            };
+            
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Boceto (20%)</div>
+                    <div class="stat-value">${stats.boceto}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Resultado (20%)</div>
+                    <div class="stat-value">${stats.resultado}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Conceptualización (20%)</div>
+                    <div class="stat-value">${stats.conceptualizacion}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Acabado (20%)</div>
+                    <div class="stat-value">${stats.acabado}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Presentación (20%)</div>
+                    <div class="stat-value">${stats.presentacion}</div>
+                </div>
+                <div class="stat-card highlight">
+                    <div class="stat-label">Total Promedio</div>
+                    <div class="stat-value">${stats.total}</div>
+                </div>
+            `;
+            
+            // Gráfica de criterios
+            const datosNombres = estudiantes.map(e => e.nombre.split(' ')[0]);
+            const datosBoceto = estudiantes.map(e => e.boceto);
+            const datosResultado = estudiantes.map(e => e.resultado);
+            const datosConceptualizacion = estudiantes.map(e => e.conceptualizacion);
+            const datosAcabado = estudiantes.map(e => e.acabado);
+            const datosPresentacion = estudiantes.map(e => e.presentacion);
+            
+            // Calcular medias
+            const mediaBoceto = (datosBoceto.reduce((a, b) => a + b, 0) / datosBoceto.length).toFixed(1);
+            const mediaResultado = (datosResultado.reduce((a, b) => a + b, 0) / datosResultado.length).toFixed(1);
+            const mediaConceptualizacion = (datosConceptualizacion.reduce((a, b) => a + b, 0) / datosConceptualizacion.length).toFixed(1);
+            const mediaAcabado = (datosAcabado.reduce((a, b) => a + b, 0) / datosAcabado.length).toFixed(1);
+            const mediaPresentacion = (datosPresentacion.reduce((a, b) => a + b, 0) / datosPresentacion.length).toFixed(1);
+            
+            if (chartCriterios) chartCriterios.destroy();
+            const ctxCriterios = document.getElementById('chartCriterios').getContext('2d');
+            chartCriterios = new Chart(ctxCriterios, {
+                type: 'bar',
+                data: {
+                    labels: datosNombres,
+                    datasets: [
+                        {
+                            label: 'Boceto (20%)',
+                            data: datosBoceto,
+                            backgroundColor: '#3b82f6',
+                            order: 2
+                        },
+                        {
+                            label: 'Resultado (20%)',
+                            data: datosResultado,
+                            backgroundColor: '#06b6d4',
+                            order: 2
+                        },
+                        {
+                            label: 'Conceptualización (20%)',
+                            data: datosConceptualizacion,
+                            backgroundColor: '#8b5cf6',
+                            order: 2
+                        },
+                        {
+                            label: 'Acabado (20%)',
+                            data: datosAcabado,
+                            backgroundColor: '#a855f7',
+                            order: 2
+                        },
+                        {
+                            label: 'Presentación (20%)',
+                            data: datosPresentacion,
+                            backgroundColor: '#ec4899',
+                            order: 2
+                        },
+                        {
+                            label: 'Media',
+                            data: [mediaBoceto, mediaResultado, mediaConceptualizacion, mediaAcabado, mediaPresentacion],
+                            type: 'line',
+                            borderColor: '#ef4444',
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#ef4444',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            order: 1,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Gráfica de total
+            const datosTotal = estudiantes.map(e => parseFloat(e.total));
+            if (chartTotal) chartTotal.destroy();
+            const ctxTotal = document.getElementById('chartTotal').getContext('2d');
+            chartTotal = new Chart(ctxTotal, {
+                type: 'line',
+                data: {
+                    labels: datosNombres,
+                    datasets: [{
+                        label: 'Calificación Total (Promedio)',
+                        data: datosTotal,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function actualizarTabla() {
+            const tablaContent = document.getElementById('tabla-content');
+            const sinDatos = document.getElementById('sin-datos-tabla');
+            
+            if (estudiantes.length === 0) {
+                tablaContent.style.display = 'none';
+                sinDatos.style.display = 'block';
+                return;
+            }
+            
+            tablaContent.style.display = 'block';
+            sinDatos.style.display = 'none';
+            
+            // Calcular medias
+            const mediaBoceto = estudiantes.reduce((s, e) => s + e.boceto, 0) / estudiantes.length;
+            const mediaResultado = estudiantes.reduce((s, e) => s + e.resultado, 0) / estudiantes.length;
+            const mediaConceptualizacion = estudiantes.reduce((s, e) => s + e.conceptualizacion, 0) / estudiantes.length;
+            const mediaAcabado = estudiantes.reduce((s, e) => s + e.acabado, 0) / estudiantes.length;
+            const mediaPresentacion = estudiantes.reduce((s, e) => s + e.presentacion, 0) / estudiantes.length;
+            const mediaTotal = estudiantes.reduce((s, e) => s + parseFloat(e.total), 0) / estudiantes.length;
+            
+            const mediaBoquetoPct = ((mediaBoceto / 20) * 100).toFixed(0);
+            const mediaResultadoPct = ((mediaResultado / 20) * 100).toFixed(0);
+            const mediaConceptualizacionPct = ((mediaConceptualizacion / 20) * 100).toFixed(0);
+            const mediaAcabadoPct = ((mediaAcabado / 20) * 100).toFixed(0);
+            const mediaPresentacionPct = ((mediaPresentacion / 20) * 100).toFixed(0);
+            const mediaTotalPct = ((mediaTotal / 20) * 100).toFixed(0);
+            
+            const tbody = document.getElementById('tablaBody');
+            let html = estudiantes.map((est, idx) => {
+                const boquetoPct = ((est.boceto / 20) * 100).toFixed(0);
+                const resultadoPct = ((est.resultado / 20) * 100).toFixed(0);
+                const conceptualizacionPct = ((est.conceptualizacion / 20) * 100).toFixed(0);
+                const acabadoPct = ((est.acabado / 20) * 100).toFixed(0);
+                const presentacionPct = ((est.presentacion / 20) * 100).toFixed(0);
+                const totalPct = ((parseFloat(est.total) / 20) * 100).toFixed(0);
+                
+                return `
+                    <tr>
+                        <td>${est.nombre}</td>
+                        <td><span class="pct-badge">${boquetoPct}%</span></td>
+                        <td><span class="pct-badge">${resultadoPct}%</span></td>
+                        <td><span class="pct-badge">${conceptualizacionPct}%</span></td>
+                        <td><span class="pct-badge">${acabadoPct}%</span></td>
+                        <td><span class="pct-badge">${presentacionPct}%</span></td>
+                        <td class="total-cell"><span class="pct-badge-total">${totalPct}%</span></td>
+                        <td>${est.hora}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Añadir fila de medias
+            html += `
+                <tr style="background: #f0f9ff; border-top: 2px solid #3b82f6; font-weight: 700;">
+                    <td style="color: #3b82f6; font-weight: 700;">MEDIA</td>
+                    <td><span class="pct-badge-media">${mediaBoquetoPct}%</span></td>
+                    <td><span class="pct-badge-media">${mediaResultadoPct}%</span></td>
+                    <td><span class="pct-badge-media">${mediaConceptualizacionPct}%</span></td>
+                    <td><span class="pct-badge-media">${mediaAcabadoPct}%</span></td>
+                    <td><span class="pct-badge-media">${mediaPresentacionPct}%</span></td>
+                    <td class="total-cell"><span class="pct-badge-total-media">${mediaTotalPct}%</span></td>
+                    <td>—</td>
+                </tr>
+            `;
+            
+            tbody.innerHTML = html;
+        }
+        
+        function cambiarVista(vista) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.getElementById(vista).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (vista === 'graficas') {
+                setTimeout(() => {
+                    if (chartCriterios) chartCriterios.resize();
+                    if (chartTotal) chartTotal.resize();
+                }, 100);
+            }
+        }
+        
+        // Inicializar
+        actualizarVistas();
+        
+        // Sincronización en tiempo real (si se abre en múltiples pestañas)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'estudiantes') {
+                estudiantes = JSON.parse(e.newValue);
+                actualizarVistas();
+            }
+        });
+        
+        function borrarTodo() {
+            const confirmacion = confirm('⚠️ ¿Estás seguro?\n\nEsto borrará TODAS las evaluaciones y no se puede deshacer.');
+            
+            if (confirmacion) {
+                const segunda = confirm('Esta es la última confirmación.\n\n¿Deseas continuar?');
+                
+                if (segunda) {
+                    localStorage.clear();
+                    estudiantes = [];
+                    actualizarVistas();
+                    alert('✓ Todos los datos han sido eliminados');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
