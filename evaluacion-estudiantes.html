@@ -930,29 +930,6 @@
         
         // Inicializar
         actualizarVistas();
-        
-        // Sincronización en tiempo real (si se abre en múltiples pestañas)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'estudiantes') {
-                estudiantes = JSON.parse(e.newValue);
-                actualizarVistas();
-            }
-        });
-        
-        function borrarTodo() {
-            const confirmacion = confirm('⚠️ ¿Estás seguro?\n\nEsto borrará TODAS las evaluaciones y no se puede deshacer.');
-            
-            if (confirmacion) {
-                const segunda = confirm('Esta es la última confirmación.\n\n¿Deseas continuar?');
-                
-                if (segunda) {
-                    localStorage.clear();
-                    estudiantes = [];
-                    actualizarVistas();
-                    alert('✓ Todos los datos han sido eliminados');
-                }
-            }
-        }
     </script>
 </body>
 </html>
